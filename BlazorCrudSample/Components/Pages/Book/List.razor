@@ -1,9 +1,10 @@
 ﻿@page "/books"
 @inject BookDbContext Context
-@inject NavigationManager NavigationManager
+@* @inject NavigationManager NavigationManager *@
 @attribute [StreamRendering]
 
 <PageTitle>Books</PageTitle>
+
 <h3>Books</h3>
 
 @if (books.Count == 0)
@@ -14,12 +15,14 @@ else
 {
     <table class="table">
         <thead>
-        <th>タイトル</th>
-        <th>著者</th>
-        <th>出版社</th>
-        <th>出版年</th>
-        <th></th>
-        <th></th>
+            <tr>
+                <th>タイトル</th>
+                <th>著者</th>
+                <th>出版社</th>
+                <th>出版年</th>
+                <th></th>
+                <th></th>
+            </tr>
         </thead>
         <tbody>
             @foreach (var book in books)
@@ -28,7 +31,7 @@ else
                     <td>@book.Title</td>
                     <td>@book.Author</td>
                     <td>@book.Publisher</td>
-                    <td>@book.PublihedYear</td>
+                    <td>@book.PublishedYear</td>
                     <td><a href="edit-game/@book.Id">編集</a></td>
                     <td><a href="edit-game/@book.Id">削除</a></td>
                 </tr>
@@ -40,21 +43,21 @@ else
 <button class="btn btn-primary">追加</button>
 
 @code {
-    List<Book> books = new();
+    private List<Book> books = new();
 
     protected override async Task OnInitializedAsync()
     {
         books = await Context.Books.ToListAsync();
     }
 
-    private async Task DeleteGame(int id)
-    {
-        var book = await Context.Books.FindAsync(id);
-        if (book is not null)
-        {
-            Context.Remove(book);
-            await Context.SaveChangesAsync();
-            NavigationManager.NavigateTo("/games");
-        }
-    }
+    // private async Task DeleteGame(int id)
+    // {
+    //     var book = await Context.Books.FindAsync(id);
+    //     if (book is not null)
+    //     {
+    //         Context.Remove(book);
+    //         await Context.SaveChangesAsync();
+    //         NavigationManager.NavigateTo("/games");
+    //     }
+    // }
 }

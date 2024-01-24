@@ -1,0 +1,107 @@
+﻿@page "/edit"
+@page "/edit/{Id:int}"
+@inject BookDbContext Context
+
+@if (Id is null)
+{
+    <PageTitle>本の登録</PageTitle>
+    <h3>本の登録</h3>
+}
+else
+{
+    <PageTitle>編集 "@Book.Title"</PageTitle>
+    <h3>編集 "@Book.Title"</h3>
+}
+
+<EditForm Model="Book" OnSubmit="HandleSubmit" FormName="BookForm">
+     <div>
+         <label for="title">Title</label>
+         <InputText id="title" @bind-Value="Book.Title" class="form-control" />
+     </div>
+     <div>
+         <label for="publisher">Publisher</label>
+         <InputText id="publisher" @bind-Value="Book.Publisher" class="form-control" />
+     </div>
+     <div>
+         <label for="publishedYear">Published Year</label>
+         <InputNumber id="publishedYear" @bind-Value="Book.ReleaseYear" class="form-control" />
+     </div>
+
+     <button type="submit" class="btn btn-primary">保存</button>
+ </EditForm>
+
+ <p>@Status</p>
+
+@code {
+    [Parameter]
+    public int? Id { get; set; } = null;
+
+    [SupplyParameterFromForm]
+    public Book Book { get; set; } = new();
+
+    private string Status = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is not null)
+        {
+            var book = await Context.Books.FindAsync(Id);
+            if (book is not null)
+            {
+                Book.Title ??= book.Title;
+                Book.Publisher ??= book.Publisher;
+                Book.PublishedYear ??= book.PublishedYear;
+            }
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (Id is not null)
+        {
+            await UpdateGame();
+        }
+        else
+        {
+            await CreateGame();
+        }
+    }
+
+    private async Task UpdateGame()
+    {
+        var book = await Context.Books.FindAsync(Id);
+        if (book is not null)
+        {
+            book.Title = Book.Title;
+            book.Publisher = Book.Publisher;
+            book.PublishedYear = Book.PublishedYear;
+
+            var result = await Context.SaveChangesAsync();
+
+            if (result == 1)
+            {
+                Status = "更新成功";
+            }
+            else
+            {
+                Status = "更新失敗";
+            }
+        }
+
+    }
+
+    private async Task CreateGame()
+    {
+        Context.Books.Add(Book);
+        var result = await Context.SaveChangesAsync();
+
+        if (result == 1)
+        {
+            Status = "追加成功";
+        }
+        else
+        {
+            Status = "追加失敗";
+        }
+    }
+}

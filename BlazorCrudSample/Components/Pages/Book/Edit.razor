@@ -15,16 +15,20 @@ else
 
 <EditForm Model="Book" OnSubmit="HandleSubmit" FormName="BookForm">
      <div>
-         <label for="title">Title</label>
+         <label for="title">タイトル</label>
          <InputText id="title" @bind-Value="Book.Title" class="form-control" />
      </div>
+    <div>
+        <label for="author">著者</label>
+        <InputText id="author" @bind-Value="Book.Author" class="form-control" />
+    </div>
      <div>
-         <label for="publisher">Publisher</label>
+         <label for="publisher">出版社</label>
          <InputText id="publisher" @bind-Value="Book.Publisher" class="form-control" />
      </div>
      <div>
-         <label for="publishedYear">Published Year</label>
-         <InputNumber id="publishedYear" @bind-Value="Book.ReleaseYear" class="form-control" />
+         <label for="publishedYear">出版年</label>
+        <InputNumber id="publishedYear" @bind-Value="Book.PublishedYear" class="form-control" />
      </div>
 
      <button type="submit" class="btn btn-primary">保存</button>
@@ -49,8 +53,9 @@ else
             if (book is not null)
             {
                 Book.Title ??= book.Title;
+                Book.Author ??= book.Author;
                 Book.Publisher ??= book.Publisher;
-                Book.PublishedYear ??= book.PublishedYear;
+                Book.PublishedYear = book.PublishedYear;
             }
         }
     }
@@ -59,20 +64,21 @@ else
     {
         if (Id is not null)
         {
-            await UpdateGame();
+            await Update();
         }
         else
         {
-            await CreateGame();
+            await Create();
         }
     }
 
-    private async Task UpdateGame()
+    private async Task Update()
     {
         var book = await Context.Books.FindAsync(Id);
         if (book is not null)
         {
             book.Title = Book.Title;
+            book.Author = Book.Author;
             book.Publisher = Book.Publisher;
             book.PublishedYear = Book.PublishedYear;
 
@@ -90,7 +96,7 @@ else
 
     }
 
-    private async Task CreateGame()
+    private async Task Create()
     {
         Context.Books.Add(Book);
         var result = await Context.SaveChangesAsync();

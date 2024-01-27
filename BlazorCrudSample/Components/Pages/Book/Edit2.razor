@@ -1,0 +1,54 @@
+﻿@page "/edit2"
+@inject BookDbContext Context
+
+<PageTitle>本の登録</PageTitle>
+<h3>本の登録</h3>
+
+<EditForm Model="Book" OnSubmit="Create" FormName="BookForm">
+    <div>
+        <label for="title">タイトル</label>
+        <InputText id="title" @bind-Value="Book.Title" class="form-control" />
+    </div>
+    <div>
+        <label for="author">著者</label>
+        <InputText id="author" @bind-Value="Book.Author" class="form-control" />
+    </div>
+    <div>
+        <label for="publisher">出版社</label>
+        <InputText id="publisher" @bind-Value="Book.Publisher" class="form-control" />
+    </div>
+    <div>
+        <label for="publishedYear">出版年</label>
+        <InputNumber id="publishedYear" @bind-Value="Book.PublishedYear" class="form-control" />
+    </div>
+
+    <br />
+    <button type="submit" class="btn btn-primary">保存</button>
+</EditForm>
+
+<p>@Message</p>
+
+@code {
+    // フォームから渡ってくるオブジェクト
+    [SupplyParameterFromForm]
+    public Book Book { get; set; } = new();
+
+    private string Message = string.Empty;
+
+    // submitイベント時に発火するイベントハンドラー
+    private async Task Create()
+    {
+        // Booksテーブルにフォームの内容をInsert
+        Context.Books.Add(Book);
+        var result = await Context.SaveChangesAsync();
+
+        if (result == 1)
+        {
+            Message = "登録しました";
+        }
+        else
+        {
+            Message = "登録に失敗しました";
+        }
+    }
+}

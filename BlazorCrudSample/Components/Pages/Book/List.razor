@@ -7,12 +7,14 @@
 
 <h3>Books</h3>
 
+@* 本のデータが取得できるまではローディング中のメッセージを表示 *@
 @if (books.Count == 0)
 {
     <p><em>Loading ...</em></p>
 }
 else
 {
+    @* 取得した本データを表形式で表示 *@
     <table class="table">
         <thead>
             <tr>
@@ -40,11 +42,12 @@ else
     </table>
 }
 
-<button class="btn btn-primary">追加</button>
+<a href="/edit2" class="btn btn-primary">追加</a>
 
 @code {
     private List<Book> books = new();
 
+    // コンポーネント初期化時にBooksテーブルから全データを取得して変数に格納
     protected override async Task OnInitializedAsync()
     {
         books = await Context.Books.ToListAsync();

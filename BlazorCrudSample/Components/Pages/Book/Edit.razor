@@ -34,7 +34,7 @@ else
      <button type="submit" class="btn btn-primary">保存</button>
  </EditForm>
 
- <p>@Status</p>
+ <p>@Message</p>
 
 @code {
     [Parameter]
@@ -43,7 +43,7 @@ else
     [SupplyParameterFromForm]
     public Book Book { get; set; } = new();
 
-    private string Status = string.Empty;
+    private string Message = string.Empty;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -86,14 +86,13 @@ else
 
             if (result == 1)
             {
-                Status = "更新成功";
+                Message = "更新成功";
             }
             else
             {
-                Status = "更新失敗";
+                Message = "更新失敗";
             }
         }
-
     }
 
     private async Task Create()
@@ -103,11 +102,11 @@ else
 
         if (result == 1)
         {
-            Status = "追加成功";
+            Message = "追加成功";
         }
         else
         {
-            Status = "追加失敗";
+            Message = "追加失敗";
         }
     }
 }

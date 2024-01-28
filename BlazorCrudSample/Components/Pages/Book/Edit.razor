@@ -4,16 +4,16 @@
 
 @if (Id is null)
 {
-    <PageTitle>本の登録</PageTitle>
-    <h3>本の登録</h3>
+    <PageTitle>書籍の登録</PageTitle>
+    <h3>書籍の登録</h3>
 }
 else
 {
-    <PageTitle>編集 "@Book.Title"</PageTitle>
-    <h3>編集 "@Book.Title"</h3>
+    <PageTitle>書籍の編集</PageTitle>
+    <h3>書籍の編集</h3>
 }
 
-<EditForm Model="Book" OnSubmit="HandleSubmit" FormName="BookForm">
+<EditForm Model="Book" OnSubmit="OnSubmit" FormName="BookForm">
      <div>
          <label for="title">タイトル</label>
          <InputText id="title" @bind-Value="Book.Title" class="form-control" />
@@ -31,36 +31,41 @@ else
         <InputNumber id="publishedYear" @bind-Value="Book.PublishedYear" class="form-control" />
      </div>
 
+    <br />
      <button type="submit" class="btn btn-primary">保存</button>
  </EditForm>
 
- <p>@Message</p>
+ <p>@message</p>
 
 @code {
     [Parameter]
     public int? Id { get; set; } = null;
 
+    // フォームから送信された情報を保持するプロパティ
     [SupplyParameterFromForm]
-    public Book Book { get; set; } = new();
+    private Book Book { get; set; } = new();
 
-    private string Message = string.Empty;
+    private string message = string.Empty;
 
+    // コンポーネント初期化時とパラメータ(今回はId)が変更された時に呼び出される
     protected override async Task OnParametersSetAsync()
     {
         if (Id is not null)
         {
+            // 書籍情報が取得できた場合はそれぞれのプロパティに値を設定する
             var book = await Context.Books.FindAsync(Id);
             if (book is not null)
             {
-                Book.Title ??= book.Title;
-                Book.Author ??= book.Author;
-                Book.Publisher ??= book.Publisher;
+                Book.Title = book.Title;
+                Book.Author = book.Author;
+                Book.Publisher = book.Publisher;
                 Book.PublishedYear = book.PublishedYear;
             }
         }
     }
 
-    private async Task HandleSubmit()
+    // フォーム送信時に呼び出される
+    private async Task OnSubmit()
     {
         if (Id is not null)
         {
@@ -72,8 +77,10 @@ else
         }
     }
 
+    // 更新処理
     private async Task Update()
     {
+        // 書籍情報が取得できた場合はそれぞれのプロパティの値をフォームの内容で更新する
         var book = await Context.Books.FindAsync(Id);
         if (book is not null)
         {
@@ -84,29 +91,17 @@ else
 
             var result = await Context.SaveChangesAsync();
 
-            if (result == 1)
-            {
-                Message = "更新成功";
-            }
-            else
-            {
-                Message = "更新失敗";
-            }
+            message = (result == 1) ? "更新しました" : "更新に失敗しました";
         }
     }
 
+    //　登録処理
     private async Task Create()
     {
+        // フォームの内容をBooksテーブルに登録する
         Context.Books.Add(Book);
         var result = await Context.SaveChangesAsync();
 
-        if (result == 1)
-        {
-            Message = "追加成功";
-        }
-        else
-        {
-            Message = "追加失敗";
-        }
+        message = (result == 1) ? "登録しました" : "登録に失敗しました";
     }
 }

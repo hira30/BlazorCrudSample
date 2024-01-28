@@ -1,10 +1,10 @@
 ﻿@page "/edit2"
 @inject BookDbContext Context
 
-<PageTitle>本の登録</PageTitle>
-<h3>本の登録</h3>
+<PageTitle>書籍の登録</PageTitle>
+<h3>書籍の登録</h3>
 
-<EditForm Model="Book" OnSubmit="Create" FormName="BookForm">
+<EditForm Model="Book" OnSubmit="OnSubmit" FormName="BookForm">
     <div>
         <label for="title">タイトル</label>
         <InputText id="title" @bind-Value="Book.Title" class="form-control" />
@@ -26,29 +26,22 @@
     <button type="submit" class="btn btn-primary">保存</button>
 </EditForm>
 
-<p>@Message</p>
+<p>@message</p>
 
 @code {
-    // フォームから渡ってくるオブジェクト
+    // フォームから送信された情報を保持するプロパティ
     [SupplyParameterFromForm]
-    public Book Book { get; set; } = new();
+    private Book Book { get; set; } = new();
 
-    private string Message = string.Empty;
+    private string message = string.Empty;
 
-    // submitイベント時に発火するイベントハンドラー
-    private async Task Create()
+    // フォーム送信時に呼び出される
+    private async Task OnSubmit()
     {
-        // Booksテーブルにフォームの内容をInsert
+        // フォームの内容をBooksテーブルに登録する
         Context.Books.Add(Book);
         var result = await Context.SaveChangesAsync();
 
-        if (result == 1)
-        {
-            Message = "登録しました";
-        }
-        else
-        {
-            Message = "登録に失敗しました";
-        }
+        message = (result == 1) ? "登録しました" : "登録に失敗しました";
     }
 }

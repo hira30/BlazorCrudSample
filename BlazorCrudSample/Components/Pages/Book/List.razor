@@ -1,6 +1,5 @@
 ﻿@page "/books"
 @inject BookDbContext Context
-@* @inject NavigationManager NavigationManager *@
 @attribute [StreamRendering]
 
 <PageTitle>Books</PageTitle>
@@ -35,7 +34,7 @@ else
                     <td>@book.Publisher</td>
                     <td>@book.PublishedYear</td>
                     <td><a href="edit/@book.Id">編集</a></td>
-                    <td>削除</td>       
+                    <td><a href="delete/@book.Id">削除</a></td>       
                 </tr>
             }
         </tbody>
@@ -52,15 +51,4 @@ else
     {
         books = await Context.Books.ToListAsync();
     }
-
-    // private async Task DeleteGame(int id)
-    // {
-    //     var book = await Context.Books.FindAsync(id);
-    //     if (book is not null)
-    //     {
-    //         Context.Remove(book);
-    //         await Context.SaveChangesAsync();
-    //         NavigationManager.NavigateTo("/games");
-    //     }
-    // }
 }

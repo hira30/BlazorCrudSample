@@ -13,7 +13,7 @@ else
     <h3>書籍の編集</h3>
 }
 
-<EditForm Model="Book" OnSubmit="OnSubmit" FormName="BookForm">
+<EditForm Model="Book" OnSubmit="OnSubmit" FormName="EditForm">
      <div>
          <label for="title">タイトル</label>
          <InputText id="title" @bind-Value="Book.Title" class="form-control" />

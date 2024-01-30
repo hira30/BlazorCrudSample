@@ -1,0 +1,67 @@
+﻿@page "/delete/{Id:int}"
+@inject BookDbContext Context
+@inject NavigationManager NavigationManager
+
+<PageTitle>書籍の削除</PageTitle>
+<h3>書籍の削除</h3>
+
+<EditForm Model="Book" OnSubmit="OnSubmit" FormName="DeleteForm">
+    <div>
+        <label for="title">タイトル</label>
+        <InputText id="title" @bind-Value="Book.Title" class="form-control" disabled />
+    </div>
+    <div>
+        <label for="author">著者</label>
+        <InputText id="author" @bind-Value="Book.Author" class="form-control" disabled />
+    </div>
+    <div>
+        <label for="publisher">出版社</label>
+        <InputText id="publisher" @bind-Value="Book.Publisher" class="form-control" disabled />
+    </div>
+    <div>
+        <label for="publishedYear">出版年</label>
+        <InputNumber id="publishedYear" @bind-Value="Book.PublishedYear" class="form-control" disabled />
+    </div>
+
+    <br />
+    <button type="submit" class="btn btn-danger">削除</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int? Id { get; set; } = null;
+
+    [SupplyParameterFromForm]
+    private Book Book { get; set; } = new();
+
+    // 初期化時にBookがnullの場合はnewする
+    protected override void OnInitialized() => Book ??= new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is not null)
+        {
+            var book = await Context.Books.FindAsync(Id);
+            if (book is not null)
+            {
+                Book.Title = book.Title;
+                Book.Author = book.Author;
+                Book.Publisher = book.Publisher;
+                Book.PublishedYear = book.PublishedYear;
+            }
+        }
+    }
+
+    private async Task OnSubmit()
+    {
+        var book = await Context.Books.FindAsync(Id);
+        if (book is not null)
+        {
+            Context.Remove(book);
+            await Context.SaveChangesAsync();
+
+            // 一覧ページに移動する
+            NavigationManager.NavigateTo("/books");
+        }
+    }
+}

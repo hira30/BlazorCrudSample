@@ -4,36 +4,46 @@
 <PageTitle>書籍の登録</PageTitle>
 <h3>書籍の登録</h3>
 
-<EditForm Model="Book" OnSubmit="OnSubmit" FormName="BookForm">
-    <div>
-        <label for="title">タイトル</label>
-        <InputText id="title" @bind-Value="Book.Title" class="form-control" />
-    </div>
-    <div>
-        <label for="author">著者</label>
-        <InputText id="author" @bind-Value="Book.Author" class="form-control" />
-    </div>
-    <div>
-        <label for="publisher">出版社</label>
-        <InputText id="publisher" @bind-Value="Book.Publisher" class="form-control" />
-    </div>
-    <div>
-        <label for="publishedYear">出版年</label>
-        <InputNumber id="publishedYear" @bind-Value="Book.PublishedYear" class="form-control" />
-    </div>
+@if (Book is null)
+{
+    <p><em>Loading ...</em></p>
+}
+else
+{
+    <EditForm Model="Book" OnSubmit="OnSubmit" FormName="BookForm">
+        <div>
+            <label for="title">タイトル</label>
+            <InputText id="title" @bind-Value="Book.Title" class="form-control" />
+        </div>
+        <div>
+            <label for="author">著者</label>
+            <InputText id="author" @bind-Value="Book.Author" class="form-control" />
+        </div>
+        <div>
+            <label for="publisher">出版社</label>
+            <InputText id="publisher" @bind-Value="Book.Publisher" class="form-control" />
+        </div>
+        <div>
+            <label for="publishedYear">出版年</label>
+            <InputNumber id="publishedYear" @bind-Value="Book.PublishedYear" class="form-control" />
+        </div>
 
-    <br />
-    <button type="submit" class="btn btn-primary">保存</button>
-</EditForm>
+        <br />
+        <button type="submit" class="btn btn-primary">保存</button>
+    </EditForm>
+}
 
 <p>@message</p>
 
 @code {
     // フォームから送信された情報を保持するプロパティ
     [SupplyParameterFromForm]
-    private Book Book { get; set; } = new();
+    private Book? Book { get; set; }
 
     private string message = string.Empty;
+
+    // コンポーネント初期化時にBookプロパティを初期化する
+    protected override void OnInitialized() => Book ??= new();
 
     // フォーム送信時に呼び出される
     private async Task OnSubmit()

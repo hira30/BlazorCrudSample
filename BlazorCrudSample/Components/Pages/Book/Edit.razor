@@ -13,29 +13,36 @@ else
     <h3>書籍の編集</h3>
 }
 
-<EditForm Model="Book" OnSubmit="OnSubmit" FormName="EditForm">
-     <div>
-         <label for="title">タイトル</label>
-         <InputText id="title" @bind-Value="Book.Title" class="form-control" />
-     </div>
-    <div>
-        <label for="author">著者</label>
-        <InputText id="author" @bind-Value="Book.Author" class="form-control" />
-    </div>
-     <div>
-         <label for="publisher">出版社</label>
-         <InputText id="publisher" @bind-Value="Book.Publisher" class="form-control" />
-     </div>
-     <div>
-         <label for="publishedYear">出版年</label>
-        <InputNumber id="publishedYear" @bind-Value="Book.PublishedYear" class="form-control" />
-     </div>
+@if (Book is null)
+{
+    <p><em>Loading ...</em></p>
+}
+else
+{
+    <EditForm Model="Book" OnSubmit="OnSubmit" FormName="EditForm">
+        <div>
+            <label for="title">タイトル</label>
+            <InputText id="title" @bind-Value="Book.Title" class="form-control" />
+        </div>
+        <div>
+            <label for="author">著者</label>
+            <InputText id="author" @bind-Value="Book.Author" class="form-control" />
+        </div>
+        <div>
+            <label for="publisher">出版社</label>
+            <InputText id="publisher" @bind-Value="Book.Publisher" class="form-control" />
+        </div>
+        <div>
+            <label for="publishedYear">出版年</label>
+            <InputNumber id="publishedYear" @bind-Value="Book.PublishedYear" class="form-control" />
+        </div>
 
-    <br />
-     <button type="submit" class="btn btn-primary">保存</button>
- </EditForm>
+        <br />
+        <button type="submit" class="btn btn-primary">保存</button>
+    </EditForm>
+}
 
- <p>@message</p>
+<p>@message</p>
 
 @code {
     [Parameter]
@@ -43,24 +50,22 @@ else
 
     // フォームから送信された情報を保持するプロパティ
     [SupplyParameterFromForm]
-    private Book Book { get; set; } = new();
+    private Book? Book { get; set; }
 
     private string message = string.Empty;
 
-    // コンポーネント初期化時とパラメータ(今回はId)が変更された時に呼び出される
-    protected override async Task OnParametersSetAsync()
+    // コンポーネント初期化時とsubmitボタン押下時にBookプロパティを初期化する
+    protected override async Task OnInitializedAsync()
     {
-        if (Id is not null)
+        if (Id is not null && Book is null)
         {
-            // 書籍情報が取得できた場合はそれぞれのプロパティに値を設定する
-            var book = await Context.Books.FindAsync(Id);
-            if (book is not null)
-            {
-                Book.Title = book.Title;
-                Book.Author = book.Author;
-                Book.Publisher = book.Publisher;
-                Book.PublishedYear = book.PublishedYear;
-            }
+            // 編集画面用の初期データをDBから取得してモデルにセット
+            Book = await Context.Books.FindAsync(Id);
+        }
+        else if (Id is null)
+        {
+            // 登録画面用に初期データをセット
+            Book = new();
         }
     }
 
@@ -80,19 +85,15 @@ else
     // 更新処理
     private async Task Update()
     {
-        // 書籍情報が取得できた場合はそれぞれのプロパティの値をフォームの内容で更新する
+        // フォームの内容でBooksテーブルの書籍情報を更新する
         var book = await Context.Books.FindAsync(Id);
-        if (book is not null)
-        {
-            book.Title = Book.Title;
-            book.Author = Book.Author;
-            book.Publisher = Book.Publisher;
-            book.PublishedYear = Book.PublishedYear;
+        book.Title = Book.Title;
+        book.Author = Book.Author;
+        book.Publisher = Book.Publisher;
+        book.PublishedYear = Book.PublishedYear;
+        var result = await Context.SaveChangesAsync();
 
-            var result = await Context.SaveChangesAsync();
-
-            message = (result == 1) ? "更新しました" : "更新に失敗しました";
-        }
+        message = (result == 1) ? "更新しました" : "更新に失敗しました";
     }
 
     //　登録処理

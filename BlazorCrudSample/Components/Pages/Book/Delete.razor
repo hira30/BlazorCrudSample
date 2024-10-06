@@ -32,13 +32,13 @@
     public int? Id { get; set; } = null;
 
     [SupplyParameterFromForm]
-    private Book Book { get; set; } = new();
+    private Book? Book { get; set; }
 
-    // 初期化時にBookがnullの場合はnewする
-    protected override void OnInitialized() => Book ??= new();
-
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
+        // コンポーネント初期化時にBookプロパティを初期化する
+        Book ??= new();
+
         if (Id is not null)
         {
             var book = await Context.Books.FindAsync(Id);
